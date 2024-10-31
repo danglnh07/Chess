@@ -173,7 +173,7 @@ namespace Chess.Util.ModelUtil
     {
         public static void Log(string content)
         {
-            string file = $"{AppDomain.CurrentDomain.BaseDirectory}/test.txt";
+            string file = $"{AppDomain.CurrentDomain.BaseDirectory}/test.log";
             File.AppendAllText(file, content);
         }
     }
