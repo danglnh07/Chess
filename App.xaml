@@ -1,0 +1,19 @@
+﻿<Application x:Class="Chess.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:Chess" 
+             xmlns:util="clr-namespace:Chess.Util.ViewUtil.Converters"
+             StartupUri="Views/MainWindow.xaml">
+    <Application.Resources>
+        <!--Dictionaries-->
+        <ResourceDictionary>
+            <!--Converters-->
+            <util:ImageTransitionConverter x:Key="ImageTransitionConverter" />
+            <util:HighlightConverter x:Key="HighlightConverter" />
+            <!--Styles-->
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Util/ViewUtil/Dictionaries/ChessButtonStyle.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

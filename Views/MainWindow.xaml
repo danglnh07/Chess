@@ -1,0 +1,73 @@
+﻿<Window x:Class="Chess.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Chess" 
+        xmlns:vm="clr-namespace:Chess.ViewModels" 
+        xmlns:views="clr-namespace:Chess.Views" 
+        mc:Ignorable="d"
+        Title="Ultimate Chess"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterScreen" Height="800" Width="1200"
+        WindowStyle="None"
+        MouseDown="Window_MouseDown">
+
+    <Grid>
+        <!--Main Window layout definition-->
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="60*" />
+            <ColumnDefinition Width="40*" />
+        </Grid.ColumnDefinitions>
+
+
+        <!--Chessboard definition-->
+        <ItemsControl Grid.Column="0" ItemsSource="{Binding Squares}" Width="600" Height="600">
+            <ItemsControl.ItemsPanel>
+                <!--Create a uniform grid to display the 8x8 chessboard-->
+                <ItemsPanelTemplate>
+                    <UniformGrid Rows="8" Columns="8" />
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+
+            <!--Define how each square is displayed-->
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <!--Each SquareVM bound item will display an Image, and click events can be handled via Command-->
+                    <Button 
+                        Command="{Binding ClickedCommand}" 
+                        Background="{Binding Background}" 
+                        Width="75" Height="75"
+                        Style="{StaticResource ChessSquareButtonStyle}"
+                    >
+                        <Grid>
+                            <!--Highlight circle for potential moves-->
+                            <Ellipse 
+                                 Width="30" Height="30" Fill="#605F5F" Opacity="0.5"
+                                 HorizontalAlignment="Center" VerticalAlignment="Center"
+                                 Visibility="{Binding IsHighlighted, Converter={StaticResource HighlightConverter}}" />
+
+                            <!--Image of the piece-->
+                            <Image Source="{Binding ImageSource}" Stretch="Uniform" Width="55" Height="55">
+                                <Image.RenderTransform>
+                                    <TranslateTransform 
+                                        Y="{Binding IsPieceSelected, Converter={StaticResource ImageTransitionConverter}}" />
+                                </Image.RenderTransform>
+                            </Image>
+                        </Grid>
+                    </Button>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+        <views:PawnPromotionPopup Grid.Column="0"/>
+
+        <Grid Grid.Column="1">
+            <StackPanel Orientation="Horizontal">
+                <Button Content="Back" Width="100" Height="40" Style="{StaticResource DefaultButtonStyle}" Command="{Binding Back}"/>
+                <Button Content="Forward" Width="100" Height="40" Style="{StaticResource DefaultButtonStyle}"/>
+                <Button Content="Exit" Click="Button_Click" Width="100" Height="40" Style="{StaticResource DefaultButtonStyle}" />
+            </StackPanel>
+        </Grid>
+    </Grid>
+
+</Window>

@@ -1,0 +1,29 @@
+# Ignore build directories
+bin/
+obj/
+
+# Ignore user-specific and Visual Studio files
+.vs/
+*.user
+*.suo
+
+# Ignore build artifacts for WPF projects
+*.pdb
+*.exe
+*.dll
+*.cache
+*.log
+
+# Ignore temporary files and directories
+*.tmp
+*.userosscache
+*.csproj.user
+
+# Ignore test result files (if you run unit tests)
+TestResults/
+
+# macOS specific files (if collaborating on macOS)
+.DS_Store
+
+# Windows specific files
+Thumbs.db
