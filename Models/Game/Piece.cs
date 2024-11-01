@@ -174,6 +174,25 @@ namespace Chess.Models.Game
         /// Gets the value of _canMove list
         /// </summary>
         public List<Position> CanMove { get { return _canMove; } }
+
+        /// <summary>
+        /// Backing field: the number of moves this current Piece has made throughout the game. Most ly useful for determine castling ability
+        /// </summary>
+        private int _moveMade = 0;
+        /// <summary>
+        /// Gets or sets the number of moves this Piece has made
+        /// </summary>
+        public int MoveMade
+        {
+            get => _moveMade;
+            set
+            {
+                if (value >= 0)
+                {
+                    _moveMade = value;
+                }
+            }
+        }
         #endregion //End Fields
 
         /// <summary>

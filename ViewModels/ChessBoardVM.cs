@@ -87,9 +87,18 @@ namespace Chess.ViewModels
                 {
                     _chessboard.ShortCastling();
                 }
+                //De-select the King
+                _chessboard.SelectedPiece = null;
 
                 //Update the state of the board
                 Update();
+
+                //Check if this leads to a checkmate (very unlikely, but it may be)
+                if (_chessboard.IsCheckmate())
+                {
+                    MessageBox.Show("Checkmate!");
+                }
+
                 return;
             }
 
