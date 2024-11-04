@@ -328,7 +328,6 @@ namespace Chess.Models.Game
         }
     }
 
-
     partial class ChessBoard
     {
         private void CalculatePawnMove(Piece pawn)
@@ -348,11 +347,12 @@ namespace Chess.Models.Game
             //Clear the candidates list
             pawn.ClearAllMoves();
 
-            //Get the initial coordinates of pawn
+            //Get the initial coordinates and Color of pawn
             int row = pawn.Position.Row, col = pawn.Position.Column;
+            Color color = pawn.Color;
 
             //The direction unit vector
-            int forward = (pawn.Color == Color.BLACK) ? 1 : -1;
+            int forward = (color == Color.BLACK) ? 1 : -1;
 
             //Temporary piece object (since there is a change that the square has no piece located at -> can be null -> nullable)
             Piece? p;

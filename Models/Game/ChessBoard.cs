@@ -58,6 +58,11 @@ namespace Chess.Models.Game
             Destination = dest;
             TakenPiece = takenPiece;
         }
+
+        public override string ToString()
+        {
+            return $"Piece {MovedPiece} from {Source} to {Destination} (taken {(TakenPiece is not null ? TakenPiece : "None")})";
+        }
     }
 
     class PawnPromotion : Move
@@ -69,6 +74,11 @@ namespace Chess.Models.Game
         {
             Pawn = pawn;
             NewRank = newRank;
+        }
+
+        public override string ToString()
+        {
+            return $"{Pawn} promoted to {NewRank}";
         }
     }
 
@@ -111,6 +121,26 @@ namespace Chess.Models.Game
         public bool IsWhiteLongCastling()
         {
             return Castle == 8;
+        }
+
+        public override string ToString()
+        {
+            if (IsBlackLongCastling())
+            {
+                return $"Back long castling";
+            }
+
+            if (IsBlackShortCastling())
+            {
+                return $"Black short castling";
+            }
+
+            if (IsWhiteShortCastling())
+            {
+                return $"White short castling";
+            }
+
+            return $"White long castling";
         }
     }
 
@@ -316,10 +346,13 @@ namespace Chess.Models.Game
 
             //Set the old position in the board to null
             _board[oldRow, oldColumn] = null;
+
             //Update the internal coordinate of the piece
             piece.Position = new Position(row, column);
+
             //We get the current piece at the destination square
             Piece? takenPiece = GetPieceAt(row, column);
+
             //Move the piece
             _board[row, column] = piece;
 
@@ -375,19 +408,16 @@ namespace Chess.Models.Game
             IsWhiteTurn = !IsWhiteTurn;
         }
 
-        public void PawnPromotion(Rank newRank)
+        public void PawnPromotion(Piece pawn, Rank newRank)
         {
             //Check if there is a pawn for promotion before promoting
             if (PawnForPromotion is not null)
             {
                 //Update to new rank
-                PawnForPromotion.Rank = newRank;
+                pawn.Rank = newRank;
 
                 //Update move list
-                UpdateMove(PawnForPromotion);
-
-                //Set pawn promotion to null
-                PawnForPromotion = null;
+                UpdateMove(pawn);
             }
         }
 
@@ -444,7 +474,7 @@ namespace Chess.Models.Game
             {
                 for (int col = 0; col < 8; col++)
                 {
-                    piece = GetPieceAt(row, col);   
+                    piece = GetPieceAt(row, col);
                     if (piece is not null && piece.Color == Color.BLACK && (piece.HasMove(p1) || piece.HasMove(p2)))
                     {
                         return false;
@@ -722,9 +752,55 @@ namespace Chess.Models.Game
             IsWhiteTurn = !IsWhiteTurn;
         }
 
-        public void GetAllMovesPossible()
+        public void GetAllMovesPossible(List<Move> allMoves, Color side)
         {
+            //Clear all moves list for safe
+            allMoves.Clear();
 
+            //Handle the normal move first
+            Piece? piece, taken;
+            Move move;
+            for (int row = 0; row < 8; row++)
+            {
+                for (int col = 0; col < 8; col++)
+                {
+                    piece = GetPieceAt(row, col);
+                    if (piece is not null && piece.Color == side)
+                    {
+                        foreach (var pos in piece.CanMove)
+                        {
+                            taken = GetPieceAt(pos);
+                            move = new NormalMove(piece.Position, piece, pos, taken);
+                            allMoves.Add(move);
+                        }
+                    }
+                }
+            }
+
+            //Handle castling
+            if (side == Color.BLACK ? CanBlackLongCastling() : CanWhiteLongCastling())
+            {
+                move = new Castling(IsWhiteTurn ? 8 : 1);
+                allMoves.Add(move);
+            }
+            else if (side == Color.BLACK ? CanBlackShortCastling() : CanWhiteShortCastling())
+            {
+                move = new Castling(IsWhiteTurn ? 4 : 2);
+                allMoves.Add(move);
+            }
+
+            //Add pawm promotion (there are 4 availables for pawn promotion, so we add 4 of them)
+            if (PawnForPromotion is not null)
+            {
+                move = new PawnPromotion(PawnForPromotion, Rank.ROOK);
+                allMoves.Add(move);
+                move = new PawnPromotion(PawnForPromotion, Rank.KNIGHT);
+                allMoves.Add(move);
+                move = new PawnPromotion(PawnForPromotion, Rank.BISHOP);
+                allMoves.Add(move);
+                move = new PawnPromotion(PawnForPromotion, Rank.QUEEN);
+                allMoves.Add(move);
+            }
         }
     }
 }

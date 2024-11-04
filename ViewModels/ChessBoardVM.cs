@@ -111,7 +111,7 @@ namespace Chess.ViewModels
                 //After the move, we check if this move is the pawn reaching the other end -> pawn promotion event
                 if (_chessboard.PawnForPromotion is not null)
                 {
-                    PawnPromotionVM.GetColor(_chessboard.PawnForPromotion.Color); //The HasPawnPromoted basically check for null
+                    PawnPromotionVM.GetColor(_chessboard.PawnForPromotion.Color);
                     PawnPromotionVM.IsVisible = true;
                 }
 
@@ -164,6 +164,7 @@ namespace Chess.ViewModels
             foreach (var square in Squares)
             {
                 var newPiece = _chessboard.GetPieceAt(square.Position.Row, square.Position.Column);
+
                 //Update the Piece in this square corresponding to the data in Model
                 square.Piece = newPiece;
                 //Update the image
@@ -186,8 +187,12 @@ namespace Chess.ViewModels
 
         public void PawnPromote(Rank newRank)
         {
-            _chessboard.PawnPromotion(newRank);
-            Update();
+            if (_chessboard.PawnForPromotion is not null)
+            {
+                _chessboard.PawnPromotion(_chessboard.PawnForPromotion, newRank);
+                Update();
+                _chessboard.PawnForPromotion = null;
+            }
         }
 
     }

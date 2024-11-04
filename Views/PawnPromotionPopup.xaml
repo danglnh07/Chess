@@ -67,6 +67,7 @@
 
                     <!-- Submit button -->
                     <Button Content="Submit" Command="{Binding SubmitCommand}" 
+                            Click="Submit_Click"
                             HorizontalAlignment="Center"
                             Style="{StaticResource DefaultButtonStyle}"
                             Width="100" Height="40"/>

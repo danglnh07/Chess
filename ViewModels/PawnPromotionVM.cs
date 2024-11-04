@@ -1,12 +1,4 @@
 ﻿using Chess.Models.Game;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Controls;
-using System.Windows.Navigation;
-
 namespace Chess.ViewModels
 {
     class PawnPromotionVM : ViewModelBase
@@ -68,8 +60,7 @@ namespace Chess.ViewModels
             }
         }
 
-        public Rank? ChosenRank { get; set; }
-
+        public Rank? ChosenRank { get; set; }   
         private ChessBoardVM _chessBoardVM;
 
         public RelayCommand ChoosePieceCommand { get; set; }
@@ -113,6 +104,8 @@ namespace Chess.ViewModels
             if (ChosenRank is not null)
             {
                 _chessBoardVM.PawnPromote((Rank) ChosenRank);
+                //Set the ChosenRank to null
+                ChosenRank = null;
                 //Close the popup
                 IsVisible = false;
             }

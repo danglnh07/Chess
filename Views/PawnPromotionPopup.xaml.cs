@@ -1,18 +1,7 @@
-﻿using Chess.ViewModels;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+
 
 namespace Chess.Views
 {
@@ -56,6 +45,25 @@ namespace Chess.Views
             }
         }
 
+        private void Submit_Click(object sender, RoutedEventArgs e)
+        {
+            // Define button names for easy reference
+            string[] buttonNames = { "queen_btn", "bishop_btn", "knight_btn", "rook_btn" };
 
+            // Clear the borders on all promotion buttons
+            foreach (string buttonName in buttonNames)
+            {
+                Button button = (Button)this.FindName(buttonName);
+                if (button != null)
+                {
+                    // Access the Border within each button's ControlTemplate and reset its thickness
+                    Border border = (Border)button.Template.FindName("ChessButtonBorder", button);
+                    if (border != null)
+                    {
+                        border.BorderThickness = new Thickness(0);
+                    }
+                }
+            }
+        }
     }
 }

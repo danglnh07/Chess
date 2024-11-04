@@ -111,6 +111,9 @@ namespace Chess.Models.Game
         //This will be used for running simulation. We still need to synchronize with the real board
         public ChessBoard ChessBoard { get; } = new ChessBoard();
 
+        private readonly List<Move> _allMoves = [];
+        private readonly Stack<Move> _trace = [];
+
         public int Evaluate()
         {
             int totalVal = 0, temp;
@@ -159,27 +162,75 @@ namespace Chess.Models.Game
          * 
          */
 
-        //public int Minimax(int depth, int alpha, int beta) 
-        //{
-        //    if (depth == 0 || ChessBoard.IsCheckmate())
-        //    {
-        //        return Evaluate();
-        //    }
+        public int Minimax(int depth, int alpha, int beta)
+        {
+            if (depth == 0 || ChessBoard.IsCheckmate())
+            {
+                return Evaluate();
+            }
 
-        //    if (ChessBoard.IsWhiteTurn)
-        //    {
-        //        int maxEvaluation = Int32.MaxValue;
-        //        List<MoveInfo> allMoves = [];
-        //        //Populate all moves list with the current state of the board
-        //        ChessBoard.GetAllMovesPossible(allMoves, ChessBoard.IsWhiteTurn ? Color.WHITE : Color.BLACK);
-        //        //We do a DFS for each move it can make
-        //        foreach (var p in allMoves)
-        //        {
-        //            //Make a move to 
-        //        }
-        //    }
-        //    return 0;
-        //}
+            if (ChessBoard.IsWhiteTurn)
+            {
+                int maxEva = Int32.MaxValue;
+                //Populate all moves list with the current state of the board
+                ChessBoard.GetAllMovesPossible(_allMoves, ChessBoard.IsWhiteTurn ? Color.WHITE : Color.BLACK);
+                //We do a DFS for each move it can make
+                foreach (var mv in _allMoves)
+                {
+                    //Make a move to that position
+                    if (mv.IsNormalMove())
+                    {
+                        var move = (NormalMove)mv;
+                        ChessBoard.Move(move.MovedPiece, move.Source);
+                        int eva = Minimax(depth - 1, alpha, beta);
+                        ChessBoard.UndoNormalMove();
+                        maxEva = Math.Max(maxEva, eva);
+                        alpha = Math.Max(eva, alpha);
+                        if (beta <= alpha) {
+                            break;
+                        }
+                        return maxEva;
+                    }
+
+                    if (mv.IsPawnPromotion())
+                    {
+                        var move = (PawnPromotion)mv;
+                        ChessBoard.PawnPromotion(move.Pawn, move.NewRank);
+                        int eva = Minimax(depth - 1, alpha, beta);
+                        ChessBoard.UndoPawnPromotion();
+                        maxEva = Math.Max(maxEva, eva);
+                        alpha = Math.Max(eva, alpha);
+                        if (beta <= alpha)
+                        {
+                            break;
+                        }
+                        return maxEva;
+                    }
+
+                    //if (mv.IsCastling())
+                    //{
+                    //    var move = (Castling)mv;
+                    //    if (move.IsBlackLongCastling())
+                    //    {
+                    //        ChessBoard.LongCastling();
+                    //    }
+                    //    else if (move.IsWhiteLongCastling())
+                    //    {
+                    //    }
+                    //    int eva = Minimax(depth - 1, alpha, beta);
+                    //    ChessBoard.UndoNormalMove();
+                    //    maxEva = Math.Max(maxEva, eva);
+                    //    alpha = Math.Max(eva, alpha);
+                    //    if (beta <= alpha)
+                    //    {
+                    //        break;
+                    //    }
+                    //    return maxEva;
+                    //}
+                }
+            }
+            return 0;
+        }
     }
 
     class Node
