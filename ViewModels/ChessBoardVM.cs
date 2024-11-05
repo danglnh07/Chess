@@ -79,13 +79,21 @@ namespace Chess.ViewModels
             if (selectedPiece is not null && selectedPiece.Rank == Rank.KING &&
                     sq.Piece is not null && sq.Piece.Rank == Rank.ROOK && sq.Piece.Color == selectedPiece.Color)
             {
-                if (sq.Position.Equals(new Position(0, 0)) || sq.Position.Equals(new Position(7, 0)))
+                if (sq.Position.Equals(new Position(0, 0)))
                 {
-                    _chessboard.LongCastling();
+                    _chessboard.BlackLongCastling();
                 }
-                else if (sq.Position.Equals(new Position(0, 7)) || sq.Position.Equals(new Position(7, 7)))
+                else if (sq.Position.Equals(new Position(7, 0)))
                 {
-                    _chessboard.ShortCastling();
+                    _chessboard.BlackShortCastling();
+                }
+                else if (sq.Position.Equals(new Position(7, 7)))
+                {
+                    _chessboard.WhiteShortCastling();
+                }
+                else if (sq.Position.Equals(new Position(7, 0)))
+                {
+                    _chessboard.WhiteLongCastling();
                 }
                 //De-select the King
                 _chessboard.SelectedPiece = null;

@@ -1,9 +1,4 @@
 ﻿using Chess.Util.ModelUtil;
-using System.Security.RightsManagement;
-using System.Threading.Channels;
-using System.Windows;
-using System.Windows.Controls;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Chess.Models.Game
 {
@@ -485,6 +480,62 @@ namespace Chess.Models.Game
             return true;
         }
 
+        public void WhiteLongCastling()
+        {
+            Piece? rook = GetPieceAt(7, 0);
+            Piece king = WhiteKing;
+
+            //Update the internal coordinate of the rook and king
+            rook!.Position.Column = 3; //If the castling condition is correct, then rook should not be null
+            king.Position.Column = 2;
+
+            //Move the rook
+            _board[7, 3] = rook;
+            _board[7, 0] = null;
+
+            //Move the king
+            _board[7, 2] = king;
+            _board[7, 4] = null;
+
+            //Change turn
+            IsWhiteTurn = !IsWhiteTurn;
+
+            //Add the move to moves stack
+            moves.Push(new Castling(1));
+        }
+
+        public void UndoWhiteLongCastling()
+        {
+            //Check if the stack is empty
+            if (moves.Count == 0)
+            {
+                return;
+            }
+
+            //Check if the top of the stack is not a White Long castling
+            if (!moves.Peek().IsCastling() && !((Castling)moves.Peek()).IsWhiteLongCastling())
+            {
+                return;
+            }
+            moves.Pop();
+
+            //Every time we do/undo any move, the turn changed accordingly, so we can just use IsWhiteTurn to decide the logic 
+            Piece? rook = GetPieceAt(7, 3);
+            Piece king = WhiteKing;
+
+            //Update the internal coordinate
+            rook!.Position.Column = 0;
+            king.Position.Column = 4;
+
+            //Move the rook
+            _board[7, 0] = rook;
+            _board[7, 3] = null;
+
+            //Move the king
+            _board[7, 4] = king;
+            _board[7, 2] = null;
+        }
+
         public bool CanBlackLongCastling()
         {
             //First, we get the Piece at position (0, 0) -> if it not a Black rook, then it cannot castling
@@ -530,34 +581,31 @@ namespace Chess.Models.Game
             return true;
         }
 
-        public void LongCastling()
+        public void BlackLongCastling()
         {
-            if (IsWhiteTurn ? CanWhiteLongCastling() : CanBlackLongCastling())
-            {
-                Piece? rook = GetPieceAt(IsWhiteTurn ? 7 : 0, 0);
-                Piece king = IsWhiteTurn ? WhiteKing : BlackKing;
+            Piece? rook = GetPieceAt(0, 0);
+            Piece king = BlackKing;
 
-                //Update the internal coordinate of the rook and king
-                rook!.Position.Column = 3; //If the castling condition is correct, then rook should not be null
-                king.Position.Column = 2;
+            //Update the internal coordinate of the rook and king
+            rook!.Position.Column = 3; //If the castling condition is correct, then rook should not be null
+            king.Position.Column = 2;
 
-                //Move the rook
-                _board[IsWhiteTurn ? 7 : 0, 3] = rook;
-                _board[IsWhiteTurn ? 7 : 0, 0] = null;
+            //Move the rook
+            _board[0, 3] = rook;
+            _board[0, 0] = null;
 
-                //Move the king
-                _board[IsWhiteTurn ? 7 : 0, 2] = king;
-                _board[IsWhiteTurn ? 7 : 0, 4] = null;
+            //Move the king
+            _board[0, 2] = king;
+            _board[0, 4] = null;
 
-                //Change turn
-                IsWhiteTurn = !IsWhiteTurn;
+            //Change turn
+            IsWhiteTurn = !IsWhiteTurn;
 
-                //Add the move to moves stack
-                moves.Push(new Castling(IsWhiteTurn ? 1 : 8));
-            }
+            //Add the move to moves stack
+            moves.Push(new Castling(8));
         }
 
-        private void UndoLongCastling()
+        private void UndoBlackLongCastling()
         {
             //Check if the stack is empty
             if (moves.Count == 0)
@@ -565,34 +613,28 @@ namespace Chess.Models.Game
                 return;
             }
 
-            //Check if the top of the stack is not a castling
-            if (!moves.Peek().IsCastling())
+            //Check if the top of the stack is not a Black Long castling
+            if (!moves.Peek().IsCastling() && !((Castling)moves.Peek()).IsBlackLongCastling())
             {
                 return;
             }
-            var cs = (Castling)moves.Pop();
-
-            //Check if this is a short castling 
-            if (cs.IsWhiteShortCastling() || cs.IsBlackShortCastling())
-            {
-                return;
-            }
+            moves.Pop();
 
             //Every time we do/undo any move, the turn changed accordingly, so we can just use IsWhiteTurn to decide the logic 
-            Piece? rook = GetPieceAt(IsWhiteTurn ? 7 : 0, 3);
-            Piece king = IsWhiteTurn ? WhiteKing : BlackKing;
+            Piece? rook = GetPieceAt(0, 3);
+            Piece king = BlackKing;
 
             //Update the internal coordinate
             rook!.Position.Column = 0;
             king.Position.Column = 4;
 
             //Move the rook
-            _board[IsWhiteTurn ? 7 : 0, 0] = rook;
-            _board[IsWhiteTurn ? 7 : 0, 3] = null;
+            _board[0, 0] = rook;
+            _board[0, 3] = null;
 
             //Move the king
-            _board[IsWhiteTurn ? 7 : 0, 4] = king;
-            _board[IsWhiteTurn ? 7 : 0, 2] = null;
+            _board[0, 4] = king;
+            _board[0, 2] = null;
         }
 
         public bool CanWhiteShortCastling()
@@ -640,6 +682,61 @@ namespace Chess.Models.Game
             return true;
         }
 
+        public void WhiteShortCastling()
+        {
+            Piece? rook = GetPieceAt(7, 7);
+            Piece king = WhiteKing;
+
+            //Update the internal coordinate of the rook and king
+            rook!.Position.Column = 5; //If the castling condition is correct, then rook should not be null
+            king.Position.Column = 6;
+
+            //Move the rook
+            _board[7, 5] = rook;
+            _board[7, 7] = null;
+
+            //Move the king
+            _board[7, 6] = king;
+            _board[7, 4] = null;
+
+            //Change turn
+            IsWhiteTurn = !IsWhiteTurn;
+
+            //Add the move to moves stack
+            moves.Push(new Castling(2));
+        }
+
+        public void UndoWhiteShortCastling()
+        {
+            //Check if the stack is empty
+            if (moves.Count == 0)
+            {
+                return;
+            }
+
+            //Check if the top of the stack is not a White Short castling
+            if (!moves.Peek().IsCastling() && !((Castling)moves.Peek()).IsWhiteShortCastling())
+            {
+                return;
+            }
+
+            //Every time we do/undo any move, the turn changed accordingly, so we can just use IsWhiteTurn to decide the logic 
+            Piece? rook = GetPieceAt(7, 5);
+            Piece king = WhiteKing;
+
+            //Update the internal coordinate
+            rook!.Position.Column = 7;
+            king.Position.Column = 4;
+
+            //Move the rook
+            _board[7, 7] = rook;
+            _board[7, 5] = null;
+
+            //Move the king
+            _board[7, 4] = king;
+            _board[7, 6] = null;
+        }
+
         public bool CanBlackShortCastling()
         {
             //First, we get the Piece at position (0, 7) -> if it not a Black rook, then it cannot castling
@@ -685,34 +782,31 @@ namespace Chess.Models.Game
             return true;
         }
 
-        public void ShortCastling()
+        public void BlackShortCastling()
         {
-            if (IsWhiteTurn ? CanWhiteShortCastling() : CanBlackShortCastling())
-            {
-                Piece? rook = GetPieceAt(IsWhiteTurn ? 7 : 0, 7);
-                Piece king = IsWhiteTurn ? WhiteKing : BlackKing;
+            Piece? rook = GetPieceAt(0, 7);
+            Piece king = BlackKing;
 
-                //Update the internal coordinate of the rook and king
-                rook!.Position.Column = 5; //If the castling condition is correct, then rook should not be null
-                king.Position.Column = 6;
+            //Update the internal coordinate of the rook and king
+            rook!.Position.Column = 5; //If the castling condition is correct, then rook should not be null
+            king.Position.Column = 6;
 
-                //Move the rook
-                _board[IsWhiteTurn ? 7 : 0, 5] = rook;
-                _board[IsWhiteTurn ? 7 : 0, 7] = null;
+            //Move the rook
+            _board[0, 5] = rook;
+            _board[0, 6] = null;
 
-                //Move the king
-                _board[IsWhiteTurn ? 7 : 0, 4] = null;
-                _board[IsWhiteTurn ? 7 : 0, 6] = king;
+            //Move the king
+            _board[0, 6] = king;
+            _board[0, 4] = null;
 
-                //Change turn
-                IsWhiteTurn = !IsWhiteTurn;
+            //Change turn
+            IsWhiteTurn = !IsWhiteTurn;
 
-                //Add the move to moves stack
-                moves.Push(new Castling(IsWhiteTurn ? 2 : 4));
-            }
+            //Add the move to moves stack
+            moves.Push(new Castling(4));
         }
 
-        public void UndoShortCastling()
+        public void UndoBlackShortCastling()
         {
             //Check if the stack is empty
             if (moves.Count == 0)
@@ -720,36 +814,27 @@ namespace Chess.Models.Game
                 return;
             }
 
-            //Check if the top of the stack is not a castling
-            if (!moves.Peek().IsCastling())
-            {
-                return;
-            }
-            var cs = (Castling)moves.Pop();
-
-            //Check if this is a long castling 
-            if (cs.IsWhiteLongCastling() || cs.IsBlackLongCastling())
+            //Check if the top of the stack is not a Black Short castling
+            if (!moves.Peek().IsCastling() && !((Castling)moves.Peek()).IsBlackShortCastling())
             {
                 return;
             }
 
-            Piece? rook = GetPieceAt(IsWhiteTurn ? 7 : 0, 5);
-            Piece king = IsWhiteTurn ? WhiteKing : BlackKing;
+            //Every time we do/undo any move, the turn changed accordingly, so we can just use IsWhiteTurn to decide the logic 
+            Piece? rook = GetPieceAt(0, 5);
+            Piece king = BlackKing;
 
             //Update the internal coordinate
             rook!.Position.Column = 7;
             king.Position.Column = 4;
 
             //Move the rook
-            _board[IsWhiteTurn ? 7 : 0, 7] = rook;
-            _board[IsWhiteTurn ? 7 : 0, 5] = null;
+            _board[0, 7] = rook;
+            _board[0, 5] = null;
 
             //Move the king
-            _board[IsWhiteTurn ? 7 : 0, 4] = king;
-            _board[IsWhiteTurn ? 7 : 0, 6] = null;
-
-            //Change turn
-            IsWhiteTurn = !IsWhiteTurn;
+            _board[0, 4] = king;
+            _board[0, 6] = null;
         }
 
         public void GetAllMovesPossible(List<Move> allMoves, Color side)
